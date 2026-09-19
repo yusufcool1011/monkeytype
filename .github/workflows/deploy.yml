@@ -3,7 +3,7 @@ name: Deploy Monkeytype to GitHub Pages
 on:
   push:
     branches:
-      - master # Adjust to 'main' if your default branch is main
+      - master
 
 permissions:
   contents: write
@@ -19,24 +19,26 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 11 # Matches current repository version
+          # This tells the action to look at package.json instead of hardcoding a version
+          package_json_file: package.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.x
           cache: 'pnpm'
 
       - name: Install Dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Build Frontend Workspace
-        run: pnpm --filter @monkeytype/frontend build
+        run: pnpm --filter @monkeytype/frontend... build
         env:
           PUBLIC_URL: /monkeytype
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: frontend/dist # Monkeytype's static output lives inside the frontend subfolder
+          folder: frontend/dist
           branch: gh-pages
+          clean: true
